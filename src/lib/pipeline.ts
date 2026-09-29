@@ -85,8 +85,10 @@ export async function extract(parts: Part[]): Promise<Extracted> {
     thinking: "low",
     maxOutputTokens: 24000,
   });
+  const rawName = (out.name ?? "").replace(/\(.*?\)/g, "").trim();
   const clean = {
-    name: (out.name ?? "").trim(),
+    // "PRIYA NAIR" → "Priya Nair"; leave mixed-case names alone.
+    name: rawName === rawName.toUpperCase() ? rawName.toLowerCase().replace(/\b\p{L}/gu, (ch) => ch.toUpperCase()) : rawName,
     email: (out.email ?? "").trim(),
     phone: (out.phone ?? "").trim(),
     location: (out.location ?? "").trim(),

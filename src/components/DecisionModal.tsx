@@ -88,7 +88,7 @@ export function DecisionModal({ candidate: c, action, settings, emailInfo, onClo
         subtitle={`${ROLE_LABEL[role]} · ${c.email ?? "no email found on CV"}`}
       />
 
-      <div className="p-6 space-y-5 max-h-[calc(100vh-220px)] overflow-y-auto scroll-thin">
+      <div className="p-6 space-y-5">
         {/* What the rubric says */}
         <div className={cx("rounded-xl border p-4", override ? "border-warn/30 bg-warn-soft/60" : invite ? "border-accent/20 bg-accent-soft/60" : "border-line bg-surface-2")}>
           <div className="flex flex-wrap items-center gap-2">
@@ -196,7 +196,7 @@ export function DecisionModal({ candidate: c, action, settings, emailInfo, onClo
         {error && <div className="text-[13px] text-danger bg-danger-soft rounded-lg px-3.5 py-2.5">{error}</div>}
       </div>
 
-      <div className="px-6 py-4 border-t border-line flex items-center justify-end gap-2.5">
+      <div className="sticky bottom-0 bg-surface rounded-b-2xl px-6 py-4 border-t border-line flex items-center justify-end gap-2.5">
         <Button onClick={onClose}>No, go back</Button>
         <Button variant={invite ? "primary" : "secondary"} className={cx(!invite && "!bg-danger !text-white !border-danger hover:!opacity-90")} loading={busy} onClick={confirm}>
           {invite ? (send ? "Yes, send invitation" : "Yes, mark shortlisted") : send ? "Yes, send decline" : "Yes, mark declined"}

@@ -76,7 +76,7 @@ export function ScoreBar({ value, decision }: { value: number | null; decision: 
         : decision === "Hold" ? "bg-warn" : "bg-line-strong";
   return (
     <div className="flex items-center gap-3 min-w-[120px]">
-      <span className="tnum text-[15px] font-semibold w-11 text-right">{value == null ? "—" : v.toFixed(v % 1 ? 1 : 0)}</span>
+      <span className="tnum text-[15px] font-semibold w-11 text-right">{value == null ? "—" : fmtScore(v)}</span>
       <div className="h-1.5 flex-1 rounded-full bg-[#EFEDE8] overflow-hidden">
         <div className={cx("h-full rounded-full", color)} style={{ width: `${v}%` }} />
       </div>
@@ -100,13 +100,15 @@ export function ScoreRing({ value, decision, size = 88 }: { value: number; decis
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <div className="tnum text-[22px] font-semibold leading-none tracking-tight">{value.toFixed(value % 1 ? 1 : 0)}</div>
+          <div className="tnum text-[22px] font-semibold leading-none tracking-tight">{fmtScore(value)}</div>
           <div className="text-[10px] text-faint mt-1">of 100</div>
         </div>
       </div>
     </div>
   );
 }
+
+export const fmtScore = (v: number) => String(Math.round(v * 100) / 100);
 
 export function Dots({ score, max = 4 }: { score: number; max?: number }) {
   return (
@@ -156,7 +158,7 @@ export function Modal({ open, onClose, children, width = "max-w-2xl" }: { open: 
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="fixed inset-0 bg-[#0B0D12]/40 backdrop-blur-[2px] animate-fade-in" onClick={onClose} />
+      <div className="fixed inset-0 bg-[#0B0D12]/40 animate-fade-in" onClick={onClose} />
       <div className={cx("relative w-full bg-surface rounded-2xl shadow-pop border border-line animate-pop-in my-auto", width)}>{children}</div>
     </div>
   );

@@ -6,9 +6,26 @@ export function sql() {
   if (!_sql) {
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error("DATABASE_URL is not set — add your Neon connection string.");
-    _sql = neon(url);
+    const raw = neon(url);
+    // Neon's HTTP driver can drop a request while a sleeping database wakes up; retry those.
+    const wrapped = ((strings: TemplateStringsArray, ...values: unknown[]) =>
+      withRetry(() => raw(strings, ...values))) as NeonQueryFunction<false, false>;
+    wrapped.query = ((text: string, params?: unknown[]) => withRetry(() => raw.query(text, params))) as unknown as typeof raw.query;
+    _sql = wrapped;
   }
   return _sql;
+}
+
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      if (attempt >= 3 || !/fetch failed|ECONNRESET|ETIMEDOUT|socket|connecting to database/i.test(msg)) throw e;
+      await new Promise((r) => setTimeout(r, 400 * 2 ** attempt));
+    }
+  }
 }
 
 let ready: Promise<void> | null = null;

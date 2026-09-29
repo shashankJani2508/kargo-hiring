@@ -1,0 +1,24 @@
+PRIYA NAIR (FICTIONAL TEST CV)
+priya.nair.test@example.com | +91 90000 11111 | Mumbai
+
+SUMMARY
+Product manager who spent three years running import documentation and customs clearance before moving into product.
+
+EXPERIENCE
+Product Manager (sole PM) — ShipLine, Series A freight visibility startup, Mumbai | Jan 2023 – Present
+- First and only PM; built the roadmap, discovery process and sprint rituals from scratch (no PM handbook existed).
+- Weekly on-site discovery with 6 named freight forwarder accounts (incl. two CHA partners); main product contact for our largest client.
+- Shipped automated BL/DO document checks: document amendment rate fell from 14% to 5% in two quarters; support tickets down 41%.
+- Killed our "carrier scorecard" feature after 8 weeks when weekly use stayed under 6%; moved the team to exception alerts, which reached 62% weekly active use.
+- Owned the Diwali-week port congestion incident: personally triaged 140 delayed shipments with the ops team, set up a daily status digest for 4 clients, then introduced an incident runbook still used today.
+- Built a Google Sheets exception tracker on my own initiative; adopted by the ops and customer success teams, later rebuilt as a core product feature.
+
+Associate Product Manager — Cargoflow (logistics SaaS, 300 staff) | Jul 2021 – Dec 2022
+- Owned the shipment tracking module; ran monthly QBRs with 3 enterprise clients.
+
+Import Documentation & Customs Executive — Allcargo-style freight forwarder, Nhava Sheva | Jun 2018 – Jun 2021
+- Prepared bills of entry, handled customs queries and holds, coordinated with CHAs and shipping lines for DO release.
+- Managed carrier allocation for 30+ weekly LCL consolidations.
+
+EDUCATION & CERTIFICATIONS
+B.Com, University of Mumbai. IATA DGR certified. Product School certificate.

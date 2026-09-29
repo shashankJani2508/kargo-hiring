@@ -438,8 +438,8 @@ function Group({ title, hint, list, ranks, tone, onOpen, onDecide }: {
         <span className="hidden sm:inline text-[12.5px] text-faint">· {hint}</span>
       </div>
       <Card className="overflow-hidden">
-        <div className="hidden lg:grid grid-cols-[56px_minmax(0,2.4fr)_110px_minmax(150px,1fr)_150px_140px_132px] items-center gap-4 px-5 h-10 border-b border-line bg-surface-2 text-[11px] font-medium uppercase tracking-[0.08em] text-faint">
-          <span>Rank</span><span>Candidate</span><span>Role</span><span>Score</span><span>Recommendation</span><span>Status</span><span className="text-right">Decide</span>
+        <div className={cx(GRID, "hidden lg:grid px-5 h-10 border-b border-line bg-surface-2 text-[11px] font-medium uppercase tracking-[0.08em] text-faint")}>
+          <span>#</span><span>Candidate</span><span>Rubric score</span><span>Recommendation</span><span>Status</span><span className="text-right">Your call</span>
         </div>
         <div className="divide-y divide-line">
           {list.map((c) => <Row key={c.id} c={c} rank={ranks.get(c.id) ?? null} onOpen={() => onOpen(c.id)} onDecide={(a) => onDecide(c.id, a)} />)}
@@ -449,29 +449,32 @@ function Group({ title, hint, list, ranks, tone, onOpen, onDecide }: {
   );
 }
 
+const GRID = "lg:grid-cols-[24px_minmax(0,1fr)_136px_128px_116px_112px] xl:grid-cols-[32px_minmax(0,1fr)_160px_140px_124px_120px] 2xl:grid-cols-[36px_minmax(0,1fr)_190px_150px_136px_176px] items-center gap-x-4";
+
 function Row({ c, rank, onOpen, onDecide }: { c: Candidate; rank: number | null; onOpen: () => void; onDecide: (a: DecisionAction) => void }) {
   const e = primaryEval(c)!;
   const d = due(c);
   const decided = c.stage !== "new";
+  const roleLabel = c.primary_role === "SPM" ? "Senior PM" : "PM";
   return (
     <div onClick={onOpen}
-      className="group grid grid-cols-[1fr_auto] lg:grid-cols-[56px_minmax(0,2.4fr)_110px_minmax(150px,1fr)_150px_140px_132px] items-center gap-x-4 gap-y-2 px-5 py-3.5 cursor-pointer hover:bg-surface-2 transition">
-      <span className="hidden lg:block tnum text-[13px] font-medium text-faint">#{rank}</span>
+      className={cx(GRID, "group grid grid-cols-[1fr_auto] gap-y-2 px-5 py-3.5 cursor-pointer hover:bg-surface-2 transition")}>
+      <span className="hidden lg:block tnum text-[13px] font-medium text-faint">{rank}</span>
       <div className="flex items-center gap-3 min-w-0">
         <Avatar name={c.name} />
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="text-[14px] font-medium truncate">{c.name ?? "Unnamed candidate"}</span>
-            {e.tenure_flag && <span title="Tenure flag" className="text-[10.5px] font-medium text-warn bg-warn-soft rounded px-1.5 py-0.5">Tenure</span>}
+            {e.tenure_flag && <span title="Tenure flag" className="shrink-0 text-[10.5px] font-medium text-warn bg-warn-soft rounded px-1.5 py-px">Tenure</span>}
           </div>
-          <div className="text-[12.5px] text-muted truncate">{e.one_line_profile}</div>
+          <div className="text-[12.5px] text-muted truncate mt-0.5">
+            <span className="font-medium text-ink-2">{roleLabel}</span>
+            {c.primary_role !== c.role_applied && <span className="text-info"> (applied {c.role_applied === "SPM" ? "Senior PM" : "PM"})</span>}
+            <span className="text-faint"> · </span>{e.one_line_profile}
+          </div>
         </div>
       </div>
       <div className="lg:hidden flex items-center gap-2 justify-end"><DecisionBadge decision={c.decision} /></div>
-      <div className="hidden lg:block text-[12.5px] text-ink-2">
-        {c.primary_role === "SPM" ? "Senior PM" : "PM"}
-        {c.primary_role !== c.role_applied && <div className="text-[11px] text-faint">applied {c.role_applied === "SPM" ? "Senior PM" : "PM"}</div>}
-      </div>
       <div className="hidden lg:flex items-center gap-2"><ScoreBar value={c.total} decision={c.decision} /><PathChip path={c.path} /></div>
       <div className="hidden lg:block"><DecisionBadge decision={c.decision} /></div>
       <div className="hidden lg:block">
@@ -486,7 +489,7 @@ function Row({ c, rank, onOpen, onDecide }: { c: Candidate; rank: number | null;
           <>
             <button onClick={() => onDecide("decline")} title="Decline"
               className="h-8 px-2.5 rounded-lg border border-line bg-surface text-[12.5px] text-muted hover:text-danger hover:border-danger/30 hover:bg-danger-soft transition flex items-center gap-1">
-              <X className="size-3.5" /> <span className="xl:inline hidden">Decline</span>
+              <X className="size-3.5" /> <span className="hidden 2xl:inline">Decline</span>
             </button>
             <button onClick={() => onDecide("invite")} title="Invite to interview"
               className="h-8 px-2.5 rounded-lg bg-accent text-white text-[12.5px] hover:bg-accent-hover transition flex items-center gap-1">

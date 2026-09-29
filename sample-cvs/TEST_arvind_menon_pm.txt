@@ -1,0 +1,15 @@
+ARVIND MENON (FICTIONAL TEST CV)
+arvind.menon.test@example.com | +91 90000 22222 | Bengaluru (open to relocating to Mumbai)
+
+EXPERIENCE
+Product Manager — PeopleStack HR-tech (Series B, one of 4 PMs) | Mar 2021 – Present
+- Ran 45+ user interviews across 7 named enterprise HR accounts to redesign onboarding; adoption +31%, time to value 3 weeks faster.
+- Analysed support tickets and redesigned settings; support volume -20%.
+- Wrote a PRD template adopted by the PM team.
+- Owned the leave-management module end to end.
+
+Business Analyst — Infosys | Jul 2018 – Feb 2021
+- Requirements gathering for banking clients.
+
+EDUCATION
+MBA, IIM Ahmedabad. B.Tech, NIT Trichy. Reforge Product Strategy.

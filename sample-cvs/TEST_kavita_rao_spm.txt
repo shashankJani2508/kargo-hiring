@@ -1,0 +1,17 @@
+KAVITA RAO (FICTIONAL TEST CV)
+kavita.rao.test@example.com | +91 90000 33333 | Hyderabad
+
+SKILLS
+Jira, Confluence, SQL, Tableau, Figma, Amplitude, Mixpanel, Python, Agile, Scrum, SAFe, OKRs
+
+EXPERIENCE
+Senior Product Manager — GlobalBank Technology Centre (45,000 staff) | 2019 – Present
+- Was part of the payments platform team with 12 PMs.
+- Supported migration of internal reconciliation services; 99.95% system uptime.
+- Shipped 38 features across 14 sprints.
+
+Product Manager — MegaRetail IT (20,000 staff) | 2016 – 2019
+- Part of the internal inventory systems group; supported courier API integrations for last-mile partners.
+
+EDUCATION
+MBA, ISB Hyderabad. PMP, CSPO.
