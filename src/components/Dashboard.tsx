@@ -66,10 +66,12 @@ export default function Dashboard() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch
     load();
-    api<{ settings: Settings; email: EmailInfo }>("/api/settings")
-      .then((r) => { setSettings(r.settings); setEmailInfo(r.email); })
-      .catch(() => {});
-    const onFocus = () => load();
+    const loadSettings = () =>
+      api<{ settings: Settings; email: EmailInfo }>("/api/settings")
+        .then((r) => { setSettings(r.settings); setEmailInfo(r.email); })
+        .catch(() => {});
+    loadSettings();
+    const onFocus = () => { load(); loadSettings(); };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
   }, [load]);

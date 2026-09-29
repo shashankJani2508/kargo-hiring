@@ -40,7 +40,7 @@ export function DecisionModal({ candidate: c, action, settings, emailInfo, onClo
   const [duration, setDuration] = useState(settings?.duration_minutes ?? 45);
   const [meet, setMeet] = useState(settings?.meet_link ?? "");
   const [reason, setReason] = useState("");
-  const [send, setSend] = useState(!!emailInfo?.configured && !!c.email);
+  const send = !!emailInfo?.configured && !!c.email;
   const [preview, setPreview] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -186,12 +186,13 @@ export function DecisionModal({ candidate: c, action, settings, emailInfo, onClo
           )}
         </div>
 
-        <label className="flex items-center gap-2.5 text-[13px] cursor-pointer select-none">
-          <input type="checkbox" className="size-4 accent-[var(--accent)]" checked={send} disabled={!emailInfo?.configured || !c.email} onChange={(ev) => setSend(ev.target.checked)} />
-          <span>Send this email now via Resend</span>
-          {!emailInfo?.configured && <span className="text-[12px] text-warn">— RESEND_API_KEY not set; decision will be recorded only</span>}
-          {emailInfo?.configured && !c.email && <span className="text-[12px] text-warn">— no email on this CV</span>}
-        </label>
+        {send ? (
+          <p className="text-[12.5px] text-muted">Clicking <span className="font-medium text-ink">Yes</span> sends this email{emailInfo?.override ? " to your test inbox" : ` to ${c.email}`} and saves your decision.</p>
+        ) : (
+          <p className="text-[12.5px] text-warn">
+            {!c.email ? "No email address was found on this CV, so no email will be sent." : "Email isn't connected yet, so no email will be sent."} Your decision will still be saved.
+          </p>
+        )}
 
         {error && <div className="text-[13px] text-danger bg-danger-soft rounded-lg px-3.5 py-2.5">{error}</div>}
       </div>
