@@ -31,16 +31,16 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
 
 # vercel
-.vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-!.env.example
-
-.vercel
+# local secrets & tooling
 .env*
+!.env.example
+.vercel
+.agents/
+.claude/skills/
