@@ -27,7 +27,6 @@ See `.env.example`.
 | `RESEND_API_KEY` | Resend API key. |
 | `EMAIL_FROM` | Sender. Use `onboarding@resend.dev` until a domain is verified in Resend. |
 | `EMAIL_OVERRIDE_TO` | Testing: redirect every email to this inbox. Clear it to email real candidates. |
-| `DASHBOARD_PASSWORD`, `AUTH_SECRET` | Dashboard login. |
 
 ## Database tables
 

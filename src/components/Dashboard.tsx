@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertTriangle, CalendarClock, Check, ChevronRight, Clock, FileUp, Inbox, LayoutList, LogOut, Mail,
+  AlertTriangle, CalendarClock, Check, ChevronRight, Clock, FileUp, Inbox, LayoutList, Mail,
   RefreshCw, Search, Settings as SettingsIcon, Sparkles, Users, Video, X,
 } from "lucide-react";
 import { api, bucket, due, primaryEval, rankCandidates } from "@/lib/client";
@@ -200,12 +200,6 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 text-[12px] text-white/70"><Sparkles className="size-3.5 text-gold" /> Rubric v3</div>
             <p className="text-[11.5px] leading-relaxed text-white/40 mt-1.5">Ranked by resemblance to your best hires. The system recommends — you decide.</p>
           </div>
-          <button
-            onClick={async () => { await fetch("/api/logout", { method: "POST" }); window.location.href = "/login"; }}
-            className="w-full flex items-center gap-2 px-2 h-8 rounded-md text-[12.5px] text-white/45 hover:text-white/80 hover:bg-white/[0.04]"
-          >
-            <LogOut className="size-3.5" /> Sign out
-          </button>
         </div>
       </aside>
 

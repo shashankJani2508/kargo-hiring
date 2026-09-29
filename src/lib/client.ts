@@ -3,10 +3,6 @@ import type { Candidate } from "./types";
 
 export async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init);
-  if (res.status === 401) {
-    window.location.href = "/login";
-    throw new Error("Signed out");
-  }
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error || `Request failed (${res.status})`);
   return json as T;
