@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getCandidate, markError, saveResult } from "@/lib/candidates";
-import { extract, fileToParts, scoreAll } from "@/lib/pipeline";
+import { ingest, scoreAll } from "@/lib/pipeline";
 
 export const maxDuration = 300;
 
@@ -16,7 +16,7 @@ export async function POST(_req: Request, ctx: RouteContext<"/api/candidates/[id
     if (!content) {
       const f = await sql()`SELECT data_b64 FROM cv_files WHERE candidate_id = ${id}`;
       if (!f[0]) throw new Error("Original file is missing; please re-upload.");
-      extracted = await extract(await fileToParts(Buffer.from(f[0].data_b64 as string, "base64"), "", c.file_name ?? "cv.pdf"));
+      extracted = await ingest(Buffer.from(f[0].data_b64 as string, "base64"), "", c.file_name ?? "cv.pdf");
       content = extracted.cv_content;
     }
     const scored = await scoreAll(content, c.role_applied);

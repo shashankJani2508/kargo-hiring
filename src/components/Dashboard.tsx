@@ -15,13 +15,14 @@ import {
 import { CandidateDrawer, type DrawerTab } from "./CandidateDrawer";
 import { DecisionModal, type DecisionAction } from "./DecisionModal";
 import { UploadModal, type UploadItem } from "./UploadModal";
-import { SettingsModal, type EmailInfo } from "./SettingsModal";
+import { SettingsModal, type EmailInfo, type GoogleInfo } from "./SettingsModal";
+import { BulkModal } from "./BulkModal";
 
 type View = "pipeline" | "interviews";
 type RoleFilter = "all" | Role;
 type StageFilter = "all" | Stage;
 
-const CONCURRENCY = 3;
+const CONCURRENCY = 5;
 
 export default function Dashboard() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -38,6 +39,8 @@ export default function Dashboard() {
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [emailInfo, setEmailInfo] = useState<EmailInfo | null>(null);
+  const [google, setGoogle] = useState<GoogleInfo | null>(null);
+  const [bulk, setBulk] = useState<{ ids: string[]; action: DecisionAction } | null>(null);
   const [toast, setToast] = useState<{ text: string; tone: "ok" | "err" } | null>(null);
 
   const notify = useCallback((text: string, tone: "ok" | "err" = "ok") => {
@@ -67,14 +70,22 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch
     load();
     const loadSettings = () =>
-      api<{ settings: Settings; email: EmailInfo }>("/api/settings")
-        .then((r) => { setSettings(r.settings); setEmailInfo(r.email); })
+      api<{ settings: Settings; email: EmailInfo; google: GoogleInfo }>("/api/settings")
+        .then((r) => { setSettings(r.settings); setEmailInfo(r.email); setGoogle(r.google); })
         .catch(() => {});
     loadSettings();
     const onFocus = () => { load(); loadSettings(); };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
   }, [load]);
+
+  useEffect(() => {
+    const g = new URLSearchParams(window.location.search).get("google");
+    if (!g) return;
+    window.history.replaceState(null, "", "/");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-off message after the Google redirect
+    notify(g === "connected" ? "Google Calendar connected — Meet links are now automatic" : "Google Calendar wasn't connected", g === "connected" ? "ok" : "err");
+  }, [notify]);
 
   const upsert = useCallback((c: Candidate) => {
     setCandidates((prev) => {
@@ -306,6 +317,7 @@ export default function Dashboard() {
                 <div className="space-y-6">
                   <Group
                     title="Recommended for interview" hint="Above the line — ranked by the rubric"
+                    bulk={{ label: "Invite all", action: "invite", onRun: (ids) => setBulk({ ids, action: "invite" }) }}
                     list={groups.recommended} ranks={ranks} tone="accent"
                     onOpen={(id) => setSelected({ id, tab: "overview" })} onDecide={(id, action) => setDecision({ id, action })}
                   />
@@ -316,6 +328,7 @@ export default function Dashboard() {
                   />
                   <Group
                     title="Not shortlisted" hint="Below the line — look once, then confirm the decline"
+                    bulk={{ label: "Decline all", action: "decline", onRun: (ids) => setBulk({ ids, action: "decline" }) }}
                     list={groups.not_recommended} ranks={ranks} tone="muted"
                     onOpen={(id) => setSelected({ id, tab: "overview" })} onDecide={(id, action) => setDecision({ id, action })}
                   />
@@ -369,9 +382,19 @@ export default function Dashboard() {
       />
 
       {settingsOpen && <SettingsModal
-        open={settingsOpen} onClose={() => setSettingsOpen(false)} settings={settings} emailInfo={emailInfo}
+        open={settingsOpen} onClose={() => setSettingsOpen(false)} settings={settings} emailInfo={emailInfo} google={google}
+        onGoogleChange={setGoogle}
         onSaved={(s) => { setSettings(s); notify("Settings saved"); }}
       />}
+
+      {bulk && (
+        <BulkModal
+          list={bulk.ids.map((id) => candidates.find((c) => c.id === id)).filter((c): c is Candidate => !!c)}
+          action={bulk.action}
+          onClose={() => setBulk(null)}
+          onUpdated={upsert}
+        />
+      )}
 
       {!uploadOpen && uploading > 0 && (
         <button onClick={() => setUploadOpen(true)}
@@ -420,11 +443,16 @@ function Kpi({ label, value, sub, icon, tone, className }: { label: string; valu
   );
 }
 
-function Group({ title, hint, list, ranks, tone, onOpen, onDecide }: {
+function Group({ title, hint, list, ranks, tone, onOpen, onDecide, bulk }: {
   title: string; hint: string; list: Candidate[]; ranks: Map<string, number>; tone: "accent" | "warn" | "muted";
   onOpen: (id: string) => void; onDecide: (id: string, a: DecisionAction) => void;
+  bulk?: { label: string; action: DecisionAction; onRun: (ids: string[]) => void };
 }) {
   if (list.length === 0) return null;
+  // Conditional shortlists are interviewed only if Path A doesn't fill the slots, so bulk invite skips them.
+  const pendingIds = list
+    .filter((c) => c.stage === "new" && !(bulk?.action === "invite" && c.decision === "Conditional shortlist"))
+    .map((c) => c.id);
   return (
     <section>
       <div className="flex items-baseline gap-3 mb-2.5 px-1">
@@ -432,6 +460,14 @@ function Group({ title, hint, list, ranks, tone, onOpen, onDecide }: {
         <h2 className="text-[14px] font-semibold tracking-tight">{title}</h2>
         <span className="tnum text-[13px] text-faint">{list.length}</span>
         <span className="hidden sm:inline text-[12.5px] text-faint">· {hint}</span>
+        {bulk && pendingIds.length > 0 && (
+          <button onClick={() => bulk.onRun(pendingIds)}
+            className={cx("ml-auto h-8 px-3 rounded-lg text-[12.5px] font-medium flex items-center gap-1.5 transition self-center",
+              bulk.action === "invite" ? "bg-accent text-white hover:bg-accent-hover" : "border border-line bg-surface text-ink-2 hover:text-danger hover:border-danger/30 hover:bg-danger-soft")}>
+            {bulk.action === "invite" ? <Check className="size-3.5" /> : <X className="size-3.5" />}
+            {bulk.label} <span className="tnum opacity-70">{pendingIds.length}</span>
+          </button>
+        )}
       </div>
       <Card className="overflow-hidden">
         <div className={cx(GRID, "hidden lg:grid px-5 h-10 border-b border-line bg-surface-2 text-[11px] font-medium uppercase tracking-[0.08em] text-faint")}>

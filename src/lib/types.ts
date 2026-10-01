@@ -19,6 +19,8 @@ export interface InterviewInfo {
   duration_minutes: number;
   meet_link: string;
   scheduled_at: string; // ISO start
+  google_event_id?: string | null;
+  google_event_link?: string | null;
 }
 
 export type Verdict = "strong" | "weak" | "skipped";

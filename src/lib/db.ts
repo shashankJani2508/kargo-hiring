@@ -88,6 +88,10 @@ async function migrate() {
     config jsonb NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now()
   )`;
+  await q`CREATE TABLE IF NOT EXISTS integrations (
+    id text PRIMARY KEY,
+    data jsonb NOT NULL
+  )`;
   await q`CREATE INDEX IF NOT EXISTS candidates_created_idx ON candidates (created_at DESC)`;
   await q`INSERT INTO settings (id, data) VALUES (1, ${JSON.stringify(DEFAULT_SETTINGS)}::jsonb) ON CONFLICT (id) DO NOTHING`;
   await q`INSERT INTO rubrics (version, config) VALUES (${RUBRIC_VERSION}, ${JSON.stringify({
@@ -104,6 +108,8 @@ export interface Settings {
   meet_link: string;
   duration_minutes: number;
   reply_to: string;
+  work_start: string;
+  work_end: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -113,6 +119,8 @@ export const DEFAULT_SETTINGS: Settings = {
   meet_link: "",
   duration_minutes: 45,
   reply_to: "",
+  work_start: "10:00",
+  work_end: "18:00",
 };
 
 export async function getSettings(): Promise<Settings> {

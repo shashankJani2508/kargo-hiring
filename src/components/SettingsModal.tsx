@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, AlertTriangle } from "lucide-react";
+import { CheckCircle2, AlertTriangle, CalendarCheck } from "lucide-react";
 import { api } from "@/lib/client";
 import type { Settings } from "@/lib/db";
 import { Button, Field, inputCls, Modal, ModalHeader } from "./ui";
@@ -12,8 +12,15 @@ export interface EmailInfo {
   override: string | null;
 }
 
-export function SettingsModal({ open, onClose, settings, emailInfo, onSaved }: {
-  open: boolean; onClose: () => void; settings: Settings | null; emailInfo: EmailInfo | null; onSaved: (s: Settings) => void;
+export interface GoogleInfo {
+  configured: boolean;
+  connected: boolean;
+  email: string | null;
+}
+
+export function SettingsModal({ open, onClose, settings, emailInfo, google, onGoogleChange, onSaved }: {
+  open: boolean; onClose: () => void; settings: Settings | null; emailInfo: EmailInfo | null;
+  google: GoogleInfo | null; onGoogleChange: (g: GoogleInfo) => void; onSaved: (s: Settings) => void;
 }) {
   const [form, setForm] = useState<Settings | null>(settings);
   const [busy, setBusy] = useState(false);
@@ -47,9 +54,36 @@ export function SettingsModal({ open, onClose, settings, emailInfo, onSaved }: {
             <Field label="Interviewer"><input className={inputCls} value={form.interviewer_name} onChange={(e) => set("interviewer_name", e.target.value)} /></Field>
             <Field label="Title"><input className={inputCls} value={form.interviewer_title} onChange={(e) => set("interviewer_title", e.target.value)} /></Field>
           </div>
-          <Field label="Default Google Meet link" hint="Pre-filled on every invite; you can change it per candidate.">
-            <input className={inputCls} value={form.meet_link} onChange={(e) => set("meet_link", e.target.value)} placeholder="https://meet.google.com/abc-defg-hij" />
-          </Field>
+          <div className="rounded-xl border border-line p-4">
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-accent-soft text-accent grid place-items-center shrink-0"><CalendarCheck className="size-[18px]" /></div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[13.5px] font-medium">Google Calendar</div>
+                <div className="text-[12px] text-muted truncate">
+                  {google?.connected ? `Connected${google.email ? ` · ${google.email}` : ""} — free slots and Meet links are automatic`
+                    : google?.configured ? "Connect once: the tool finds free slots and creates a Meet link for every invite"
+                      : "Needs a one-time Google setup (GOOGLE_CLIENT_ID / SECRET) before it can be connected"}
+                </div>
+              </div>
+              {google?.connected ? (
+                <Button size="sm" variant="ghost" onClick={async () => {
+                  await api("/api/google/disconnect", { method: "POST" });
+                  onGoogleChange({ ...google, connected: false, email: null });
+                }}>Disconnect</Button>
+              ) : (
+                <Button size="sm" variant="primary" disabled={!google?.configured} onClick={() => { window.location.href = "/api/google/connect"; }}>Connect</Button>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Interviews from (IST)"><input type="time" className={inputCls} value={form.work_start} onChange={(e) => set("work_start", e.target.value)} /></Field>
+            <Field label="Interviews until (IST)"><input type="time" className={inputCls} value={form.work_end} onChange={(e) => set("work_end", e.target.value)} /></Field>
+          </div>
+          {!google?.connected && (
+            <Field label="Fallback Google Meet room" hint="Only used while Google Calendar isn't connected.">
+              <input className={inputCls} value={form.meet_link} onChange={(e) => set("meet_link", e.target.value)} placeholder="https://meet.google.com/abc-defg-hij" />
+            </Field>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <Field label="Default duration">
               <select className={inputCls} value={form.duration_minutes} onChange={(e) => set("duration_minutes", Number(e.target.value))}>
